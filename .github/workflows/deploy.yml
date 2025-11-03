@@ -21,9 +21,7 @@ jobs:
       - name: Maven package
         run: |
           mvn clean package
-          cd target
-          java -agentlib:native-image-agent=config-output-dir=../src/main/resources/META-INF/native-image -jar jrebel-license-all.jar -s 15
-          cd ../
+          java -agentlib:native-image-agent=config-output-dir=src/main/resources/META-INF/native-image -jar target/jrebel-license-all.jar -s 15
           mvn -Pnative package
       - name: Prepare Release File (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
