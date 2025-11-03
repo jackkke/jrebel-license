@@ -21,22 +21,19 @@ jobs:
       - name: Maven package
         run: |
           mvn clean package
+          cd target
+          java -agentlib:native-image-agent=config-output-dir=../src/main/resources/META-INF/native-image -jar jrebel-license-all.jar -s 15
+          cd ../
           mvn -Pnative package
       - name: Prepare Release File (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
         run: |
-          mkdir jrebel-license-Linux
-          cp target/jrebel-license ./jrebel-license-Linux
-          zip -r -q jrebel-license-Linux-${{ github.ref_name }}.zip jrebel-license-Linux
-          mkdir jrebel-license-Java
-          cp target/jrebel-license-all.jar ./jrebel-license-Java
-          zip -r -q jrebel-license-Java-${{ github.ref_name }}.zip jrebel-license-Java
+          cp target/jrebel-license ./jrebel-license-Linux-${{ github.ref_name }}
+          cp target/jrebel-license-all.jar ./jrebel-license-${{ github.ref_name }}.jar
       - name: Prepare Release File (windows only)
         if: matrix.platform == 'windows-latest'
         run: |
-          mkdir jrebel-license-windows
-          cp target/jrebel-license.exe ./jrebel-license-windows
-          Compress-Archive -Path jrebel-license-windows -DestinationPath jrebel-license-windows-${{ github.ref_name  }}.zip
+          cp target/jrebel-license.exe ./jrebel-license-${{ github.ref_name  }}.exe
       - name: Release
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')

@@ -61,7 +61,11 @@ public class MainServer extends AbstractHandler {
                 + "/{tokenname}, with any email.");
         System.out.println("JRebel 2018.1 and later version Activation address was: http://localhost:" + port
                 + "/{guid}(eg:http://localhost:" + port + "/" + UUID.randomUUID().toString() + "), with any email.");
-
+        String stop = arguments.get("s");
+        if (stop != null) {
+            Thread.sleep(1000L * Integer.parseInt(stop));
+            server.stop();
+        }
         server.join();
     }
 
