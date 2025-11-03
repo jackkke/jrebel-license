@@ -1,0 +1,50 @@
+name: GraalVM build
+on:
+  push:
+    tags:
+      - '*'
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: graalvm/setup-graalvm@v1
+        with:
+          java-version: '21'
+          distribution: 'graalvm'
+      - name: Maven package
+        run: |
+          mvn -Pall clean package
+          cd target
+          java -agentlib:native-image-agent=config-output-dir=../src/main/resources/META-INF/native-image -jar jrebel-license-all.jar
+          cd ../
+          mvn -Pnative package
+      - name: Prepare Release File (ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          mkdir jrebel-license-Linux
+          cp target/jrebel-license ./jrebel-license-Linux
+          zip -r -q jrebel-license-Linux-${{ github.ref_name }}.zip jrebel-license-Linux
+          mkdir jrebel-license-Java
+          cp target/jrebel-license-all.jar ./jrebel-license-Java
+          zip -r -q jrebel-license-Java-${{ github.ref_name }}.zip jrebel-license-Java
+      - name: Prepare Release File (windows only)
+        if: matrix.platform == 'windows-latest'
+        run: |
+          mkdir jrebel-license-windows
+          cp target/jrebel-license.exe ./jrebel-license-windows
+          Compress-Archive -Path jrebel-license-windows -DestinationPath jrebel-license-windows-${{ github.ref_name  }}.zip
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            jrebel-license-*.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
