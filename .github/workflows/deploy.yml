@@ -21,14 +21,6 @@ jobs:
       - name: Maven package
         run: |
           mvn clean package
-          cd target
-          # 跨平台超时执行
-          if [ matrix.platform == 'windows-latest' ]; then
-            powershell "Start-Process java -ArgumentList '-agentlib:native-image-agent=config-output-dir=../src/main/resources/META-INF/native-image -jar jrebel-license-all.jar' -NoNewWindow -Wait -Timeout 10" || true
-          else
-            timeout 10s java -agentlib:native-image-agent=config-output-dir=../src/main/resources/META-INF/native-image -jar jrebel-license-all.jar || true
-          fi
-          cd ../
           mvn -Pnative package
       - name: Prepare Release File (ubuntu only)
         if: matrix.platform == 'ubuntu-latest'
