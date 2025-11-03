@@ -1,8 +1,9 @@
 package com.vvvtimes.server;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.vvvtimes.JrebelUtil.JrebelSign;
 import com.vvvtimes.util.rsasign;
-import net.sf.json.JSONObject;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -108,9 +109,7 @@ public class MainServer extends AbstractHandler {
                 "    \"evaluationLicense\": false,\n" +
                 "    \"seatPoolType\": \"standalone\"\n" +
                 "}\n";
-        JSONObject jsonObject = JSONObject.fromObject(jsonStr);
-        String body = jsonObject.toString();
-        response.getWriter().print(body);
+        response.getWriter().print(JsonParser.parseString(jsonStr).toString());
     }
 
     private void jrebelLeases1Handler(String target, Request baseRequest, HttpServletRequest request,
@@ -128,9 +127,9 @@ public class MainServer extends AbstractHandler {
                 "    \"msg\": null,\n" +
                 "    \"statusMessage\": null\n" +
                 "}\n";
-        JSONObject jsonObject = JSONObject.fromObject(jsonStr);
+        JsonObject jsonObject = JsonParser.parseString(jsonStr).getAsJsonObject();
         if (username != null) {
-            jsonObject.put("company", username);
+            jsonObject.addProperty("company", username);
         }
         String body = jsonObject.toString();
         response.getWriter().print(body);
@@ -144,7 +143,7 @@ public class MainServer extends AbstractHandler {
         String clientRandomness = request.getParameter("randomness");
         String username = request.getParameter("username");
         String guid = request.getParameter("guid");
-        System.out.println(((Request) request).getParameters());
+        System.out.println(request.getParameterMap());
         boolean offline = Boolean.parseBoolean(request.getParameter("offline"));
         String validFrom = "null";
         String validUntil = "null";
@@ -183,15 +182,15 @@ public class MainServer extends AbstractHandler {
                 "    \"licenseValidUntil\": 1691839999000\n" +
                 "}";
 
-        JSONObject jsonObject = JSONObject.fromObject(jsonStr);
+        JsonObject jsonObject = JsonParser.parseString(jsonStr).getAsJsonObject();
         if (clientRandomness == null || username == null || guid == null) {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         } else {
             JrebelSign jrebelSign = new JrebelSign();
             jrebelSign.toLeaseCreateJson(clientRandomness, guid, offline, validFrom, validUntil);
             String signature = jrebelSign.getSignature();
-            jsonObject.put("signature", signature);
-            jsonObject.put("company", username);
+            jsonObject.addProperty("signature", signature);
+            jsonObject.addProperty("company", username);
             String body = jsonObject.toString();
             response.getWriter().print(body);
         }
