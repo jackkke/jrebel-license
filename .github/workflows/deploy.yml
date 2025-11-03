@@ -39,6 +39,6 @@ jobs:
         if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
-            jrebel-license-*.zip
+            jrebel-license-*
         env:
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
