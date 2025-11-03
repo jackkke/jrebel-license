@@ -71,8 +71,6 @@ public class MainServer extends AbstractHandler {
 
     @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        System.out.println(target);
-
         if (target.equals("/")) {
             indexHandler(target, baseRequest, request, response);
         } else if (target.equals("/jrebel/leases")) {
@@ -92,6 +90,7 @@ public class MainServer extends AbstractHandler {
         } else if (target.equals("/rpc/releaseTicket.action")) {
             releaseTicketHandler(target, baseRequest, request, response);
         } else {
+            System.out.println("unknown target: " + target);
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
     }
