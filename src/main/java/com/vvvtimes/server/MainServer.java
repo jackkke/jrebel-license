@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 
-import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.eclipse.jetty.server.Request;
@@ -62,7 +61,7 @@ public class MainServer extends AbstractHandler {
         System.out.println("JRebel 2018.1 and later version Activation address was: http://localhost:" + port
                 + "/{guid}(eg:http://localhost:" + port + "/" + UUID.randomUUID().toString() + "), with any email.");
         String stop = arguments.get("s");
-        if (stop != null) {
+        if (stop != null && port.matches("\\d+")) {
             Thread.sleep(1000L * Integer.parseInt(stop));
             server.stop();
         }
@@ -70,77 +69,82 @@ public class MainServer extends AbstractHandler {
     }
 
     @Override
-    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-        if (target.equals("/")) {
-            indexHandler(target, baseRequest, request, response);
-        } else if (target.equals("/jrebel/leases")) {
-            jrebelLeasesHandler(target, baseRequest, request, response);
-        } else if (target.equals("/jrebel/leases/1")) {
-            jrebelLeases1Handler(target, baseRequest, request, response);
-        } else if (target.equals("/agent/leases")) {
-            jrebelLeasesHandler(target, baseRequest, request, response);
-        } else if (target.equals("/agent/leases/1")) {
-            jrebelLeases1Handler(target, baseRequest, request, response);
-        } else if (target.equals("/jrebel/validate-connection")) {
-            jrebelValidateHandler(target, baseRequest, request, response);
-        } else if (target.equals("/rpc/ping.action")) {
-            pingHandler(target, baseRequest, request, response);
-        } else if (target.equals("/rpc/obtainTicket.action")) {
-            obtainTicketHandler(target, baseRequest, request, response);
-        } else if (target.equals("/rpc/releaseTicket.action")) {
-            releaseTicketHandler(target, baseRequest, request, response);
-        } else {
-            System.out.println("unknown target: " + target);
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+    public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
+        try {
+            if (target.equals("/")) {
+                indexHandler(baseRequest, request, response);
+            } else if (target.equals("/jrebel/leases")) {
+                jrebelLeasesHandler(baseRequest, request, response);
+            } else if (target.equals("/jrebel/leases/1")) {
+                jrebelLeases1Handler(baseRequest, request, response);
+            } else if (target.equals("/agent/leases")) {
+                jrebelLeasesHandler(baseRequest, request, response);
+            } else if (target.equals("/agent/leases/1")) {
+                jrebelLeases1Handler(baseRequest, request, response);
+            } else if (target.equals("/jrebel/validate-connection")) {
+                jrebelValidateHandler(baseRequest, response);
+            } else if (target.equals("/rpc/ping.action")) {
+                pingHandler(baseRequest, request, response);
+            } else if (target.equals("/rpc/obtainTicket.action")) {
+                obtainTicketHandler(baseRequest, request, response);
+            } else if (target.equals("/rpc/releaseTicket.action")) {
+                releaseTicketHandler(baseRequest, request, response);
+            } else {
+                System.out.println("unknown target: " + target);
+                response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.out.println("请求异常 target ： " + target + ", error is " + e.getMessage());
         }
     }
 
-    private void jrebelValidateHandler(String target, Request baseRequest, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    private void jrebelValidateHandler(Request baseRequest, HttpServletResponse response) throws IOException {
         response.setContentType("application/json; charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
-        String jsonStr = "{\n" +
-                "    \"serverVersion\": \"3.2.4\",\n" +
-                "    \"serverProtocolVersion\": \"1.1\",\n" +
-                "    \"serverGuid\": \"a1b4aea8-b031-4302-b602-670a990272cb\",\n" +
-                "    \"groupType\": \"managed\",\n" +
-                "    \"statusCode\": \"SUCCESS\",\n" +
-                "    \"company\": \"Administrator\",\n" +
-                "    \"canGetLease\": true,\n" +
-                "    \"licenseType\": 1,\n" +
-                "    \"evaluationLicense\": false,\n" +
-                "    \"seatPoolType\": \"standalone\"\n" +
-                "}\n";
+        String jsonStr = """
+                {
+                    "serverVersion": "3.2.4",
+                    "serverProtocolVersion": "1.1",
+                    "serverGuid": "a1b4aea8-b031-4302-b602-670a990272cb",
+                    "groupType": "managed",
+                    "statusCode": "SUCCESS",
+                    "company": "Administrator",
+                    "canGetLease": true,
+                    "licenseType": 1,
+                    "evaluationLicense": false,
+                    "seatPoolType": "standalone"
+                }
+                """;
         response.getWriter().print(JsonParser.parseString(jsonStr).toString());
     }
 
-    private void jrebelLeases1Handler(String target, Request baseRequest, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    private void jrebelLeases1Handler(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json; charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         String username = request.getParameter("username");
         baseRequest.setHandled(true);
-        String jsonStr = "{\n" +
-                "    \"serverVersion\": \"3.2.4\",\n" +
-                "    \"serverProtocolVersion\": \"1.1\",\n" +
-                "    \"serverGuid\": \"a1b4aea8-b031-4302-b602-670a990272cb\",\n" +
-                "    \"groupType\": \"managed\",\n" +
-                "    \"statusCode\": \"SUCCESS\",\n" +
-                "    \"msg\": null,\n" +
-                "    \"statusMessage\": null\n" +
-                "}\n";
+        String jsonStr = """
+                {
+                    "serverVersion": "3.2.4",
+                    "serverProtocolVersion": "1.1",
+                    "serverGuid": "a1b4aea8-b031-4302-b602-670a990272cb",
+                    "groupType": "managed",
+                    "statusCode": "SUCCESS",
+                    "msg": null,
+                    "statusMessage": null
+                }
+                """;
         JsonObject jsonObject = JsonParser.parseString(jsonStr).getAsJsonObject();
         if (username != null) {
             jsonObject.addProperty("company", username);
         }
         String body = jsonObject.toString();
         response.getWriter().print(body);
-
     }
 
-    private void jrebelLeasesHandler(String target, Request baseRequest, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    private void jrebelLeasesHandler(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("application/json; charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         String clientRandomness = request.getParameter("randomness");
@@ -173,7 +177,7 @@ public class MainServer extends AbstractHandler {
                 "    \"serverRandomness\": \"H2ulzLlh7E0=\",\n" +
                 "    \"seatPoolType\": \"standalone\",\n" +
                 "    \"statusCode\": \"SUCCESS\",\n" +
-                "    \"offline\": " + String.valueOf(offline) + ",\n" +
+                "    \"offline\": " + offline + ",\n" +
                 "    \"validFrom\": " + validFrom + ",\n" +
                 "    \"validUntil\": " + validUntil + ",\n" +
                 "    \"company\": \"Administrator\",\n" +
@@ -199,8 +203,7 @@ public class MainServer extends AbstractHandler {
         }
     }
 
-    private void releaseTicketHandler(String target, Request baseRequest, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    private void releaseTicketHandler(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html; charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         String salt = request.getParameter("salt");
@@ -216,8 +219,7 @@ public class MainServer extends AbstractHandler {
         }
     }
 
-    private void obtainTicketHandler(String target, Request baseRequest, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    private void obtainTicketHandler(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html; charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         SimpleDateFormat fm = new SimpleDateFormat("EEE,d MMM yyyy hh:mm:ss Z", Locale.ENGLISH);
@@ -241,8 +243,7 @@ public class MainServer extends AbstractHandler {
         }
     }
 
-    private void pingHandler(String target, Request baseRequest, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    private void pingHandler(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html; charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         String salt = request.getParameter("salt");
@@ -256,15 +257,12 @@ public class MainServer extends AbstractHandler {
             String body = "<!-- " + xmlSignature + " -->\n" + xmlContent;
             response.getWriter().print(body);
         }
-
     }
 
-    private void indexHandler(String target, Request baseRequest, HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
+    private void indexHandler(Request baseRequest, HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.setContentType("text/html; charset=utf-8");
         response.setStatus(HttpServletResponse.SC_OK);
         baseRequest.setHandled(true);
-
         int port = request.getServerPort();
         String html = "<h1>Hello,This is a Jrebel & JetBrains License Server!</h1>";
         html += "<p>License Server started at http://localhost:" + port;
@@ -274,8 +272,6 @@ public class MainServer extends AbstractHandler {
         html += "<p>JRebel 2018.1 and later version Activation address was: http://localhost:" + port
                 + "/{guid}(eg:<span style='color:red'>http://localhost:" + port + "/" + UUID.randomUUID().toString()
                 + "</span>), with any email.";
-
         response.getWriter().println(html);
-
     }
 }
