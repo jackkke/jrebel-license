@@ -1,6 +1,6 @@
 services:
   jrebel:
     # image: jackkke/jrebel-license:0.0.12
-    image: jackkke/-license:0.0.12-alpine
+    image: jackkke/-license:0.0.12-native
     ports:
       - "8081:8081"

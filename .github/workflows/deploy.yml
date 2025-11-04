@@ -45,14 +45,14 @@ jobs:
           tags: jackkke/jrebel-license:${{ github.ref_name }}
           build-args: |
             VERSION=${{ github.ref_name }}
-      - name: Build and push alpine
+      - name: Build and push native
         if: matrix.platform == 'ubuntu-latest'
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: Dockerfile-alpine
+          file: Dockerfile-native
           push: true
-          tags: jackkke/jrebel-license:${{ github.ref_name }}-alpine
+          tags: jackkke/jrebel-license:${{ github.ref_name }}-native
           build-args: |
             VERSION=${{ github.ref_name }}
       - name: Prepare Release File (windows only)

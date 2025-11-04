@@ -12,8 +12,8 @@
         <finalName>jrebel-license</finalName>
         <java.version>21</java.version>
         <mainClass>com.vvvtimes.server.MainServer</mainClass>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -57,6 +57,25 @@
                                 <mainClass>${mainClass}</mainClass>
                             </manifest>
                         </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-toolchains-plugin</artifactId>
+                    <version>3.2.0</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>toolchain</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <toolchains>
+                            <jdk>
+                                <version>${java.version}</version>
+                            </jdk>
+                        </toolchains>
                     </configuration>
                 </plugin>
             </plugins>
@@ -117,6 +136,9 @@
                                 <buildArg>-H:+UnlockExperimentalVMOptions</buildArg>
                                 <buildArg>-H:-CheckToolchain</buildArg>
                                 <buildArg>-march=compatibility</buildArg>
+                                <!-- 可选：添加以下参数提高兼容性 -->
+                                <!--<buildArg>&#45;&#45;initialize-at-build-time</buildArg>
+                                <buildArg>-H:+AddAllCharsets</buildArg>-->
                             </buildArgs>
                         </configuration>
                     </plugin>
