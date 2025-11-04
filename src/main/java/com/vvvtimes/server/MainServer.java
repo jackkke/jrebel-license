@@ -62,6 +62,10 @@ public class MainServer extends AbstractHandler {
                 + "/{guid}(eg:http://localhost:" + port + "/" + UUID.randomUUID().toString() + "), with any email.");
         String stop = arguments.get("s");
         if (stop != null && port.matches("\\d+")) {
+            JrebelSign jrebelSign = new JrebelSign();
+            jrebelSign.toLeaseCreateJson("clientRandomness", "guid", false, "validFrom", "validUntil");
+            String sign = rsasign.Sign(jrebelSign.getSignature());
+            System.out.println("test sign = " + sign);
             Thread.sleep(1000L * Integer.parseInt(stop));
             server.stop();
         }
