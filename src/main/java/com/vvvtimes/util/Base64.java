@@ -1,25 +1,23 @@
 package com.vvvtimes.util;
 
+import java.nio.charset.StandardCharsets;
 
 public class Base64 {
-	/**
-	 * 编码
-	 * 
-	 * @param bstr
-	 * @return String
-	 */
-	public static String encode(byte[] bstr) {
-		return org.apache.commons.codec.binary.Base64.encodeBase64String(bstr);
-	}
+    /**
+     * 编码
+     *
+     * @param bstr
+     * @return String
+     */
+    public static byte[] encode(byte[] bstr) {
+        return java.util.Base64.getEncoder().encode(bstr);
+    }
 
-	/**
-	 * 解码
-	 * 
-	 * @param str
-	 * @return string
-	 */
-	public static byte[] decode(String str) {
-		return org.apache.commons.codec.binary.Base64.decodeBase64(str);
-	}
 
+    public static byte[] decode(String str) {
+        return decode(str.getBytes(StandardCharsets.UTF_8));
+    }
+    public static byte[] decode(byte[] str) {
+        return java.util.Base64.getDecoder().decode(str);
+    }
 }

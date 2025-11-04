@@ -1,7 +1,5 @@
 package com.vvvtimes.JrebelUtil;
 
-import org.apache.commons.lang3.StringUtils;
-
 public class JrebelSign {
     private String signature;
 
@@ -12,12 +10,12 @@ public class JrebelSign {
         //String value = String.valueOf("false");
         String s2= "";
         if(offline){
-            s2 = StringUtils.join((Object[]) new String[]{clientRandomness, serverRandomness, installationGuidString , String.valueOf(offline), validFrom, validUntil}, ';');
-        }else{
-            s2 = StringUtils.join((Object[]) new String[]{clientRandomness, serverRandomness, installationGuidString , String.valueOf(offline)}, ';');
+            s2 = String.join(";", clientRandomness, serverRandomness, installationGuidString, String.valueOf(offline), validFrom, validUntil);
+        } else {
+            s2 = String.join(";", clientRandomness, serverRandomness, installationGuidString, String.valueOf(offline));
         }
         System.out.println(s2);
-        final byte[] a2 =LicenseServer2ToJRebelPrivateKey.a(s2.getBytes());
+        final byte[] a2 = LicenseServer2ToJRebelPrivateKey.a(s2.getBytes());
         this.signature = ByteUtil.a(a2);
     }
 
