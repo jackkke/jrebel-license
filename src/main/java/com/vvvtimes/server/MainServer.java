@@ -93,7 +93,7 @@ public class MainServer extends AbstractHandler {
                 System.out.println("unknown target: " + target);
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             }
-        } catch (IOException e) {
+        } catch (Throwable e) {
             e.printStackTrace();
             System.out.println("请求异常 target ： " + target + ", error is " + e.getMessage());
         }
