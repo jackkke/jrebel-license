@@ -1,0 +1,12 @@
+FROM alpine:3.22.2 as builder
+ARG VERSION
+COPY jrebel-license-Linux-${VERSION} /jrebel-license
+RUN chmod +x /jrebel-license
+
+FROM alpine:3.22.2
+WORKDIR /app
+RUN apk add --no-cache libc6-compat
+COPY --from=builder /jrebel-license ./
+ENV PORT=8081
+EXPOSE 8081
+ENTRYPOINT exec ./jrebel-license -p ${PORT}
